@@ -1,4 +1,9 @@
 try:
+    import deep_glide  # pytype: disable=import-error
+except ImportError:
+    deep_glide = None
+
+try:
     import pybullet_envs  # pytype: disable=import-error
 except ImportError:
     pybullet_envs = None

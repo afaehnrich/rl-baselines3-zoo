@@ -1,5 +1,13 @@
 #!/bin/bash
+SECONDS=0 
+python3 train.py --algo sac --env JSBSim-v0 -n 1000000 --eval-freq 1000 --save-freq 50000 --tensorboard-log logs
+echo Laufzeit: $SECONDS Sekunden
 
-python3 train.py --algo sac --env JSBSim-v0 -n 1000000 --eval-freq 10000 --save-freq 50000 --tensorboard-log logs
+# Laufzeit 1.100 Schritte nur Simulation:
+# VecEnvSubproc: 104 s
+# ohne VecEnv: 101 s
 
-#python3 train.py --algo sac --env JSBSim-v0 -n 100000 -optimize --n-trials 1000 --sampler random --pruner median --tensorboard-log ./tensorboard/
+# Laufzeit 1.100 Schritte Training:
+# VecEnvSubproc: 125 s
+# ohne VecEnv: 118 s
+# 3x parallel : 118s
