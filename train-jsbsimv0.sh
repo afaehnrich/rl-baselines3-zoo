@@ -1,6 +1,6 @@
 #!/bin/bash
 SECONDS=0 
-python3 train.py --algo sac --env JSBSim-v0 -n 1000000 --eval-freq 1000 --save-freq 50000 --tensorboard-log logs
+python3 train.py --algo sac --env JSBSim-v0 -n 1000000 --eval-freq 10000 --save-freq 50000 --tensorboard-log logs
 echo Laufzeit: $SECONDS Sekunden
 
 # Laufzeit 1.100 Schritte nur Simulation:
