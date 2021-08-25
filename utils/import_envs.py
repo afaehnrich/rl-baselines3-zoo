@@ -1,6 +1,7 @@
 try:
     import deep_glide  # pytype: disable=import-error
 except ImportError:
+    print('Error: Deep glide could not be improted!')
     deep_glide = None
 
 try:

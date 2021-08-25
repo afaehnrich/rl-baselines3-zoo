@@ -104,6 +104,7 @@ if __name__ == "__main__":  # noqa: C901
             closest_match = difflib.get_close_matches(env_id, registered_envs, n=1)[0]
         except IndexError:
             closest_match = "'no close match found...'"
+            print(registered_envs)
         raise ValueError(f"{env_id} not found in gym registry, you maybe meant {closest_match}?")
 
     # Unique id to ensure there is no race condition for the folder creation
