@@ -1,8 +1,9 @@
-try:
-    import deep_glide  # pytype: disable=import-error
-except ImportError:
-    print('Error: Deep glide could not be improted!')
-    deep_glide = None
+#try:
+#    import deep_glide  # pytype: disable=import-error
+#except ImportError:
+#    print('Error: Deep glide could not be improted!')
+#    deep_glide = None
+import deep_glide
 
 try:
     import pybullet_envs  # pytype: disable=import-error
