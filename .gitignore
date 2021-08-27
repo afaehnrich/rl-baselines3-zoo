@@ -10,7 +10,7 @@ cluster_torchy.sh
 logs/
 logs_enjoy/
 logs_backup/
-rl-trained_agents/
+# rl-trained_agents/
 .pytype/
 htmlcov/
 git_rewrite_commit_history.sh
