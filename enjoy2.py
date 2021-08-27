@@ -92,11 +92,13 @@ def main():  # noqa: C901
     parser.add_argument("-n", "--n-timesteps", help="number of timesteps", default=1000, type=int)
     parser.add_argument("--num-threads", help="Number of threads for PyTorch (-1 to use default)", default=-1, type=int)
     parser.add_argument("--n-envs", help="number of environments", default=1, type=int)
-    parser.add_argument("--exp-id", help="Experiment ID (default: 0: latest, -1: no exp folder)", default=0, type=int)
+    # parser.add_argument("--exp-id", help="Experiment ID (default: 0: latest, -1: no exp folder)", default=0, type=int)
+    parser.add_argument("--exp-id", help="Experiment ID (default: 0: latest, -1: no exp folder)", default=0, type=str)
     parser.add_argument("--verbose", help="Verbose mode (0: no output, 1: INFO)", default=1, type=int)
     parser.add_argument(
         "--no-render", action="store_true", default=False, help="Do not render the environment (useful for tests)"
     )
+    parser.add_argument("--render-mode", default='step', help="Whether to render at each step or at the end of an episode")    
     parser.add_argument("--deterministic", action="store_true", default=False, help="Use deterministic actions")
     parser.add_argument(
         "--load-best", action="store_true", default=False, help="Load best model instead of last model if available"
@@ -134,12 +136,12 @@ def main():  # noqa: C901
     algo = args.algo
     folder = args.folder
 
-    if args.exp_id == 0:
+    if args.exp_id == '0':
         args.exp_id = get_latest_run_id(os.path.join(folder, algo), env_id)
         print(f"Loading latest experiment, id={args.exp_id}")
 
     # Sanity checks
-    if args.exp_id > 0:
+    if args.exp_id != '0' and args.exp_id !='-1':
         log_path = os.path.join(folder, algo, f"{env_id}_{args.exp_id}")
     else:
         log_path = os.path.join(folder, algo)
@@ -163,6 +165,8 @@ def main():  # noqa: C901
 
     if not found:
         raise ValueError(f"No model found for {algo} on {env_id}, path: {model_path}")
+    else:
+        print(f"Loading model for {algo} on {env_id}, path: {model_path}")
 
     off_policy_algos = ["qrdqn", "dqn", "ddpg", "sac", "her", "td3", "tqc"]
 
@@ -262,9 +266,14 @@ def main():  # noqa: C901
 
                 # log info variables to tensorboard
                 if (step % info_freq == 0 or done) and type(infos[0]) is dict:
+                    if not args.no_render:
+                        if not done and args.render_mode=='step':
+                            fig = env.render("human")
+                        elif done and args.render_mode=='episode':
+                            fig = env.envs[0].rendered_episode
                     xlsx_logger.set_step_ep(ep_count, step)
                     for key in infos[0]:
-                        if key == 'episode' or key == 'terminal_observation': continue
+                        if key == 'episode' or key == 'terminal_observation' or key == 'render': continue
                         val = infos[0].get(key)
                         logger.record("eval/"+key, val, exclude='stdout')
                         xlsx_logger.log(key, val)
@@ -311,8 +320,10 @@ def main():  # noqa: C901
                         episode_reward, ep_len = 0.0, 0
                         ep_count +=1
 
-            if not args.no_render:
-                fig = env.render("human")
+            # if (not args.no_render) and args.render_mode=='step':
+            #     fig = env.render("human")
+            # else:
+            #     fig = None
 
     except KeyboardInterrupt:
         pass
