@@ -1,33 +1,19 @@
-ARG PARENT_IMAGE
-ARG USE_GPU
-FROM $PARENT_IMAGE
+FROM afaehnrich/deep-glide:latest
 
-RUN apt-get -y update \
-    && apt-get -y install \
-    ffmpeg \
-    freeglut3-dev \
-    swig \
-    xvfb \
-    libxrandr2 \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+WORKDIR ${CODE_DIR}
 
-ENV CODE_DIR /root/code
-ENV VENV /root/venv
-COPY requirements.txt /tmp/
-
-
-RUN \
-    mkdir -p ${CODE_DIR}/rl_zoo && \
-    pip uninstall -y stable-baselines3 && \
-    pip install -r /tmp/requirements.txt && \
-    pip install git+https://github.com/eleurent/highway-env && \
-    rm -rf $HOME/.cache/pip
-
-ENV PATH=$VENV/bin:$PATH
-
-COPY docker/entrypoint.sh /tmp/
-RUN chmod +x /tmp/entrypoint.sh
-ENTRYPOINT ["/tmp/entrypoint.sh"]
-
+# kompatible Versionen von stable-baselines3 und rl-baselines3-zoo von Git holen. Sonst gibts Fehlermeldung.
+RUN pip install xlsxwriter
+RUN pip uninstall -y sb3-contrib
+RUN rm -r stable-baselines3
+RUN pip install sb3-contrib==1.0 stable-baselines3==1.1.0a3
+RUN rm -r rl-baselines3-zoo
+ADD . ${CODE_DIR}/rl-baselines3-zoo
+# environment registration für die eigenen environemnts in rl-zoo integrieren
+# RUN cp -v -rt ${CODE_DIR}/rl-baselines3-zoo ${CODE_DIR}/deep-glide/rl_zoo/*
+# deep-glide als Python-Modul installieren
+WORKDIR ${CODE_DIR}/rl-baselines3-zoo
+RUN mkdir -p logs
+RUN mkdir -p logs_enjoy
+# RUN mkdir -p rl-trained-agents
 CMD /bin/bash

@@ -46,6 +46,7 @@ class Xlsx_Logger():
         # self.workbook = xlsxwriter.Workbook(os.path.join(self.dir, self.filename_step), {'constant_memory': True})
 
     def log(self, key, value, add_to_mean = True):
+        if not np.isfinite(value): return
         if not key in self._keys:
             self._keys.update({ key: len(self._keys) })            
             self.add_header(key, self.worksheet_step)
@@ -93,7 +94,7 @@ def main():  # noqa: C901
     parser.add_argument("--num-threads", help="Number of threads for PyTorch (-1 to use default)", default=-1, type=int)
     parser.add_argument("--n-envs", help="number of environments", default=1, type=int)
     # parser.add_argument("--exp-id", help="Experiment ID (default: 0: latest, -1: no exp folder)", default=0, type=int)
-    parser.add_argument("--exp-id", help="Experiment ID (default: 0: latest, -1: no exp folder)", default=0, type=str)
+    parser.add_argument("--exp-id", help="Experiment ID (default: 0: latest, -1: no exp folder)", default='0', type=str)
     parser.add_argument("--verbose", help="Verbose mode (0: no output, 1: INFO)", default=1, type=int)
     parser.add_argument(
         "--no-render", action="store_true", default=False, help="Do not render the environment (useful for tests)"
