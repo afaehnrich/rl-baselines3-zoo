@@ -24,13 +24,13 @@ class Xlsx_Logger():
     _vals= {}
     SAVE_FREQ = 10
     ep = 0
+    steps_row = []
 
     def __init__(self, dir, env_id):
         self.dir = dir
-        self.filename_step = env_id + '.xlsx'
-        self.filename_ep = env_id + '_ep.xlsx'
-        print('logging steps to xlsx: ', os.path.join(self.dir, self.filename_step))
-        self.workbook = xlsxwriter.Workbook(os.path.join(self.dir, self.filename_step), {'constant_memory': True})
+        self.filename = env_id + '.xlsx'
+        print('logging steps to xlsx: ', os.path.join(self.dir, self.filename))
+        self.workbook = xlsxwriter.Workbook(os.path.join(self.dir, self.filename), {'constant_memory': True})
         self.worksheet_step = self.workbook.add_worksheet(name = 'Steps')
         self.worksheet_ep_mean = self.workbook.add_worksheet(name = 'Episode means')
         self.worksheet_ep_std = self.workbook.add_worksheet(name = 'Episode standard deviations')
@@ -39,19 +39,15 @@ class Xlsx_Logger():
 
 
     def add_header(self, key, worksheet):
-        # self.workbook.close()
-        # self.workbook = xlsxwriter.Workbook(os.path.join(self.dir, self.filename_step))
-        worksheet.write(0, self._keys[key], key)
-        # self.workbook.close()
-        # self.workbook = xlsxwriter.Workbook(os.path.join(self.dir, self.filename_step), {'constant_memory': True})
+        worksheet.write_string(0, self._keys[key], key)
 
     def log(self, key, value, add_to_mean = True):
         if not np.isfinite(value): return
         if not key in self._keys:
-            self._keys.update({ key: len(self._keys) })            
+            self._keys.update({ key: len(self._keys) })
             self.add_header(key, self.worksheet_step)
-        self.worksheet_step.write(self.current_row_step, self._keys[key], value)
-        if add_to_mean:
+        self.steps_row.append((self._keys[key], value))
+        if add_to_mean:        
             if not key in self._vals:
                 self._vals.update({ key: [] })
                 self.add_header(key, self.worksheet_step)
@@ -60,6 +56,9 @@ class Xlsx_Logger():
             self._vals[key].append(value)
 
     def set_step_ep(self, episode, step):
+        for col, val in self.steps_row:
+            self.worksheet_step.write(self.current_row_step, col, val)
+        self.steps_row = []
         self.current_row_step +=1        
         self.log('step', step, False)
         if episode != self.ep:
