@@ -15,6 +15,7 @@ from utils.exp_manager import ExperimentManager
 from utils.utils import StoreDict
 from matplotlib import pyplot as plt
 import xlsxwriter
+from pathlib import Path
 
 # from torch.utils.tensorboard import SummaryWriter
 
@@ -30,6 +31,7 @@ class Xlsx_Logger():
         self.dir = dir
         self.filename = env_id + '.xlsx'
         print('logging steps to xlsx: ', os.path.join(self.dir, self.filename))
+        Path(self.dir).mkdir(parents=True, exist_ok=True)
         self.workbook = xlsxwriter.Workbook(os.path.join(self.dir, self.filename), {'constant_memory': True})
         self.worksheet_step = self.workbook.add_worksheet(name = 'Steps')
         self.worksheet_ep_mean = self.workbook.add_worksheet(name = 'Episode means')
@@ -251,10 +253,10 @@ def main():  # noqa: C901
     # For HER, monitor success rate
     successes = []
     sbcommon_utils.configure_logger(args.verbose, os.path.join(args.tensorboard_log, env_id), algo.upper(), reset_num_timesteps=True)
-    xlsx_logger = Xlsx_Logger(logger.get_dir(), env_id)
+    xlsx_logpath = os.path.join(args.tensorboard_log, env_id) if logger.get_dir() is None else logger.get_dir()
+    xlsx_logger = Xlsx_Logger(xlsx_logpath, env_id)
     fig: plt.Figure = None
     info_freq = args.info_freq
-    save_freq = 1000
     try:
         for step in range(args.n_timesteps):
             action, state = model.predict(obs, state=state, deterministic=deterministic)
