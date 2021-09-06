@@ -255,6 +255,8 @@ def main():  # noqa: C901
     sbcommon_utils.configure_logger(args.verbose, os.path.join(args.tensorboard_log, env_id), algo.upper(), reset_num_timesteps=True)
     xlsx_logpath = os.path.join(args.tensorboard_log, env_id) if logger.get_dir() is None else logger.get_dir()
     xlsx_logger = Xlsx_Logger(xlsx_logpath, env_id)
+    with open(os.path.join(xlsx_logpath,'args.yaml'), 'w') as file:
+        yaml.dump(args,file)
     fig: plt.Figure = None
     info_freq = args.info_freq
     try:
