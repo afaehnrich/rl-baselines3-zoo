@@ -27,7 +27,7 @@ JSBSim2D-v1:
   gradient_steps: 64
   learning_starts: 10000
   use_sde: True
-  policy_kwargs: "dict(log_std_init=-3, net_arch=[4096, 1024])"
+  policy_kwargs: "dict(log_std_init=-3, net_arch=[400, 300])"
 
 JSBSim2D-v2:
   n_timesteps: !!float 1e6
@@ -91,8 +91,8 @@ JSBSim2D-v5:
   gradient_steps: 64
   learning_starts: 10000
   use_sde: True
-  # policy_kwargs: "dict(log_std_init=-3, net_arch=[400, 300])"
-  policy_kwargs: "dict(log_std_init=-3, net_arch=[1020, 500, 300])"
+  policy_kwargs: "dict(log_std_init=-3, net_arch=[400, 300])"
+  # policy_kwargs: "dict(log_std_init=-3, net_arch=[1020, 500, 300])"
   
 JSBSim2D-v6:
   n_timesteps: !!float 1e6
